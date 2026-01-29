@@ -1,0 +1,31 @@
+// Prisma schema for MCQ Maker
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Quiz {
+  id        String     @id @default(cuid())
+  title     String
+  createdAt DateTime   @default(now())
+  questions Question[]
+}
+
+model Question {
+  id           String   @id @default(cuid())
+  quizId       String
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  text         String
+  options      Json     // string[]
+  correctIndex Int
+  hint         String?
+
+  createdAt    DateTime @default(now())
+
+  @@index([quizId])
+}

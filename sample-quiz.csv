@@ -1,0 +1,6 @@
+question,optionA,optionB,optionC,optionD,answer,hint
+"1's Complement পদ্ধতিতে একটি সংখ্যার ঋণাত্মক মান কীভাবে প্রকাশ করা হয়?","সব বিট অপরিবর্তিত রেখে","সব বিট উল্টে দিয়ে (0→1, 1→0)","শুধু MSB পরিবর্তন করে","২ যোগ করে","B","1's Complement এ সব বিট invert করা হয়"
+"2's Complement পদ্ধতিতে একটি সংখ্যার ঋণাত্মক মান নির্ণয় করতে কী করতে হয়?","1's Complement নিতে","1's Complement নিয়ে 1 যোগ করতে","শুধু MSB পরিবর্তন করতে","সব বিট 0 করতে","B","2's Complement = 1's Complement + 1"
+"Sign Magnitude পদ্ধতিতে +0 এবং -0 এর অবস্থা কী?","একই","ভিন্ন","শুধু +0 থাকে","শুধু -0 থাকে","B","Sign Magnitude এ +0 ও -0 আলাদা"
+"কোন পদ্ধতিতে শূন্যের দুটি আলাদা রূপ থাকে?","2's Complement","1's Complement","Sign Magnitude","সবগুলো","C","Sign Magnitude এ +0 ও -0 থাকে"
+"কোন সংখ্যা উপস্থাপন পদ্ধতি আধুনিক কম্পিউটারে সবচেয়ে বেশি ব্যবহৃত হয়?","Sign Magnitude","1's Complement","2's Complement","BCD","C","2's Complement arithmetic সহজ"
