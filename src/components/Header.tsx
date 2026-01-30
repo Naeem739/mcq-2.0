@@ -6,12 +6,13 @@ export default async function Header() {
   const user = await getUserFromCookie();
 
   return (
-    <header className="border-b border-zinc-200 bg-white shadow-sm">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white">
+    <header className="border-b border-slate-200 bg-white shadow-sm sticky top-0 z-50">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center gap-4">
+          {/* Logo - Left */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white flex-shrink-0">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -27,45 +28,57 @@ export default async function Header() {
                 </svg>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg font-bold text-zinc-900">Quiz Practice</h1>
-                <p className="text-xs text-zinc-600">Student Learning Platform</p>
+                <h1 className="text-lg font-bold text-slate-900">Quiz Practice</h1>
+                <p className="text-xs text-slate-600">Student Platform</p>
               </div>
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Desktop Navigation - Center */}
+          <nav className="hidden md:flex items-center gap-8 flex-1 justify-center">
             <Link
               href="/"
-              className="text-sm font-medium text-zinc-700 hover:text-blue-600 transition-colors"
+              className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors whitespace-nowrap"
             >
               Home
             </Link>
             {user && (
               <Link
                 href="/profile"
-                className="text-sm font-medium text-zinc-700 hover:text-blue-600 transition-colors"
+                className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors whitespace-nowrap"
               >
                 Profile
               </Link>
             )}
             <Link
               href="/admin/upload"
-              className="text-sm font-medium text-zinc-700 hover:text-blue-600 transition-colors"
+              className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors whitespace-nowrap"
             >
               Admin
             </Link>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <AuthNav user={user} />
-            <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile Navigation - Center */}
+          <div className="flex md:hidden items-center gap-1 sm:gap-2 flex-1 justify-center">
+            <Link
+              href="/"
+              className="rounded px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
+            >
+              Home
+            </Link>
+            {user && (
               <Link
-                href="/"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
+                href="/profile"
+                className="rounded px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
-                Home
+                Profile
               </Link>
-            </div>
+            )}
+          </div>
+
+          {/* Auth Component - Right */}
+          <div className="flex-shrink-0">
+            <AuthNav user={user} />
           </div>
         </div>
       </div>

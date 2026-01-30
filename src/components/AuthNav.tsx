@@ -5,10 +5,12 @@ import { logoutAction } from "@/app/auth/login/actions";
 
 export default function AuthNav({ user }: { user?: { userId: string; email: string } | null }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-end">
       {user ? (
         <>
-          <span className="text-sm text-zinc-600">{user.email}</span>
+          <span className="text-xs sm:text-sm text-slate-600 truncate max-w-[120px] sm:max-w-none">
+            {user.email}
+          </span>
           <form
             action={async () => {
               await logoutAction();
@@ -17,18 +19,19 @@ export default function AuthNav({ user }: { user?: { userId: string; email: stri
           >
             <button
               type="submit"
-              className="text-sm font-semibold text-zinc-700 hover:text-zinc-900"
+              className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 whitespace-nowrap"
             >
-              Log out
+              Logout
             </button>
           </form>
         </>
       ) : (
         <>
-          <Link href="/auth/login" className="text-sm font-semibold text-blue-700 hover:underline">
+          <Link href="/auth/login" className="text-xs sm:text-sm font-semibold text-blue-700 hover:text-blue-800 whitespace-nowrap">
             Log in
           </Link>
-          <Link href="/auth/signup" className="text-sm font-semibold text-blue-700 hover:underline">
+          <span className="text-slate-400">|</span>
+          <Link href="/auth/signup" className="text-xs sm:text-sm font-semibold text-blue-700 hover:text-blue-800 whitespace-nowrap">
             Sign up
           </Link>
         </>
