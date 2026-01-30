@@ -43,12 +43,6 @@ export default async function AdminPage() {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Link
-              className="flex-1 sm:flex-none rounded-xl sm:rounded-2xl border border-zinc-200 bg-white px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-zinc-800 shadow-sm hover:bg-zinc-50 text-center transition-colors"
-              href="/"
-            >
-              Home
-            </Link>
             <form action={adminLogout} className="flex-1 sm:flex-none">
               <button
                 type="submit"
@@ -136,12 +130,6 @@ export default async function AdminPage() {
               )}
             </div>
           </div>
-        </div>
-        
-        <div className="mt-6 sm:mt-8 text-center">
-          <p className="text-xs sm:text-sm text-zinc-500">
-            Developed by <span className="font-semibold text-zinc-700">Naeem</span>
-          </p>
         </div>
       </div>
     </div>

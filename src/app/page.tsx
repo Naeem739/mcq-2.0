@@ -60,12 +60,6 @@ export default async function Home() {
             </div>
           )}
         </div>
-        
-        <div className="mt-6 sm:mt-8 text-center">
-          <p className="text-xs sm:text-sm text-zinc-500">
-            Developed by <span className="font-semibold text-zinc-700">Naeem</span>
-          </p>
-        </div>
       </div>
     </div>
   );

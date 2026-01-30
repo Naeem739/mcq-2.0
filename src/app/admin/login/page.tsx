@@ -26,12 +26,6 @@ export default async function AdminLoginPage({
             Tip: set <span className="font-mono">ADMIN_PASSWORD</span> in your <span className="font-mono">.env</span>.
           </p>
         </div>
-        
-        <div className="mt-6 text-center">
-          <p className="text-xs sm:text-sm text-zinc-500">
-            Developed by <span className="font-semibold text-zinc-700">Naeem</span>
-          </p>
-        </div>
       </div>
     </div>
   );

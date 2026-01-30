@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 export type PracticeQuestion = {
@@ -20,13 +20,52 @@ export default function PracticeClient({
 }) {
   const isBangla = (s: string) => /[\u0980-\u09FF]/.test(s);
   const total = questions.length;
+  const totalTimeInMinutes = total; // Total time in minutes = number of questions
+  const totalTimeInSeconds = totalTimeInMinutes * 60; // Convert to seconds
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(() => Array(total).fill(null));
   const [showResult, setShowResult] = useState(false);
+  const [isReviewMode, setIsReviewMode] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(totalTimeInSeconds);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const q = questions[idx];
   const selected = answers[idx];
   const checked = selected !== null;
+
+  // Overall quiz timer effect
+  useEffect(() => {
+    if (showResult || isReviewMode) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    // Start overall countdown timer
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          // Time's up - go to results immediately
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          setShowResult(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [showResult, isReviewMode]);
 
   const correctCount = useMemo(
     () =>
@@ -45,6 +84,7 @@ export default function PracticeClient({
     [answers, questions],
   );
   const answeredCount = useMemo(() => answers.filter((a) => a !== null).length, [answers]);
+  const skipCount = useMemo(() => answers.filter((a) => a === null).length, [answers]);
 
   const progressPct = useMemo(() => {
     if (!total) return 0;
@@ -78,6 +118,29 @@ export default function PracticeClient({
     setIdx(0);
     setAnswers(Array(total).fill(null));
     setShowResult(false);
+    setIsReviewMode(false);
+    setTimeLeft(totalTimeInSeconds);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  // Format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  function enterReviewMode() {
+    setIsReviewMode(true);
+    setShowResult(false);
+    setIdx(0);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   }
 
   const isFinished = showResult || answeredCount === total;
@@ -99,7 +162,18 @@ export default function PracticeClient({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {!showResult && !isReviewMode && (
+              <span className={`rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold tabular-nums ring-2 ${
+                timeLeft <= 60
+                  ? "bg-red-100 text-red-700 ring-red-300"
+                  : timeLeft <= 180
+                    ? "bg-orange-100 text-orange-700 ring-orange-300"
+                    : "bg-blue-100 text-blue-700 ring-blue-300"
+              }`}>
+                ⏱ {formatTime(timeLeft)}
+              </span>
+            )}
             <span className="rounded-full bg-red-50 px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold tabular-nums text-red-700 ring-1 ring-red-200">
               ✕ {wrongCount}
             </span>
@@ -112,7 +186,12 @@ export default function PracticeClient({
         <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
           <div className="min-w-0 flex-1">
             <div className="truncate text-xs sm:text-sm font-semibold text-blue-700">{quizTitle}</div>
-            <div className="text-xs text-zinc-500">Question {idx + 1}</div>
+            <div className="flex items-center gap-3">
+              <div className="text-xs text-zinc-500">Question {idx + 1}</div>
+              {isReviewMode && (
+                <div className="text-xs text-blue-600 font-semibold">Review Mode</div>
+              )}
+            </div>
           </div>
           <Link
             className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-zinc-800 shadow-sm hover:bg-zinc-50 transition-colors"
@@ -128,16 +207,31 @@ export default function PracticeClient({
             <div className="mt-2 text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">
               Completed
             </div>
-            <div className="mt-2 text-sm text-zinc-600">
-              Score: <span className="font-semibold text-zinc-900">{correctCount}</span> / {total}
+            <div className="mt-4 space-y-2">
+              <div className="text-sm text-zinc-600">
+                Score: <span className="font-semibold text-zinc-900">{correctCount}</span> / {total}
+              </div>
+              <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 font-semibold text-green-700 ring-1 ring-green-200">
+                  <span>✓</span>
+                  <span>Correct: {correctCount}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 font-semibold text-red-700 ring-1 ring-red-200">
+                  <span>✕</span>
+                  <span>Wrong: {wrongCount}</span>
+                </span>
+                {skipCount > 0 && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1.5 font-semibold text-yellow-700 ring-1 ring-yellow-200">
+                    <span>⊘</span>
+                    <span>Skipped: {skipCount}</span>
+                  </span>
+                )}
+              </div>
             </div>
             <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  setShowResult(false);
-                  setIdx(0);
-                }}
+                onClick={enterReviewMode}
                 className="flex-1 sm:flex-none rounded-xl sm:rounded-2xl border border-zinc-200 px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors"
               >
                 Review
@@ -164,14 +258,30 @@ export default function PracticeClient({
               {q.options.map((opt, i) => {
                 const optLang = isBangla(opt) ? "bn" : "en";
                 const isSel = selected === i;
-                const isCorrect = checked && i === q.correctIndex;
-                const isWrong = checked && isSel && i !== q.correctIndex;
+                const isCorrectAnswer = i === q.correctIndex;
+                
+                // In review mode, show all correct answers
+                // In practice mode, only show verdict (correct/wrong) for selected answer
+                let showAsCorrect = false;
+                let showAsWrong = false;
+                
+                if (isReviewMode) {
+                  // Review mode: show correct answer always
+                  showAsCorrect = isCorrectAnswer;
+                  showAsWrong = isSel && !isCorrectAnswer;
+                } else {
+                  // Practice mode: only show verdict for selected answer
+                  if (checked) {
+                    showAsCorrect = isSel && isCorrectAnswer;
+                    showAsWrong = isSel && !isCorrectAnswer;
+                  }
+                }
 
                 const base =
                   "group w-full rounded-xl sm:rounded-2xl border-2 px-3 sm:px-4 py-3 sm:py-4 text-left text-sm sm:text-base font-medium shadow-sm transition-all duration-200";
-                const cls = isCorrect
+                const cls = showAsCorrect
                   ? `${base} border-green-600 bg-green-100 text-zinc-900 shadow-green-200`
-                  : isWrong
+                  : showAsWrong
                     ? `${base} border-red-600 bg-red-100 text-zinc-900 shadow-red-200`
                     : isSel
                       ? `${base} border-blue-400 bg-blue-100 text-zinc-900`
@@ -182,13 +292,13 @@ export default function PracticeClient({
                     key={`${q.id}-${i}`}
                     type="button"
                     onClick={() => choose(i)}
-                    disabled={checked}
+                    disabled={checked || isReviewMode}
                     className={`${cls} disabled:cursor-not-allowed disabled:opacity-70`}
                   >
                     <span className={`mr-2 sm:mr-3 inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs sm:text-sm font-semibold ring-1 transition-colors ${
-                      isCorrect
+                      showAsCorrect
                         ? "bg-green-600 text-white ring-green-700"
-                        : isWrong
+                        : showAsWrong
                           ? "bg-red-600 text-white ring-red-700"
                           : isSel
                             ? "bg-blue-500 text-white ring-blue-600"
@@ -197,6 +307,9 @@ export default function PracticeClient({
                       {String.fromCharCode("A".charCodeAt(0) + i)}
                     </span>
                     <span lang={optLang} className="break-words">{opt}</span>
+                    {isReviewMode && isCorrectAnswer && (
+                      <span className="ml-2 text-xs font-semibold text-green-700">✓ Correct</span>
+                    )}
                   </button>
                 );
               })}
@@ -223,6 +336,11 @@ export default function PracticeClient({
               <span className="font-semibold text-zinc-900">
                 {correctCount}/{total}
               </span>
+              {skipCount > 0 && (
+                <span className="ml-2 text-zinc-500">
+                  (Skipped: {skipCount})
+                </span>
+              )}
             </div>
           ) : (
             <div className="text-xs sm:text-sm text-zinc-500 text-center sm:text-left">

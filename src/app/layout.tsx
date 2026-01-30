@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { tiroBangla, timesNewRoman } from "@/lib/fonts";
 import InstallPrompt from "@/components/InstallPrompt";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,9 +46,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${timesNewRoman.variable} ${tiroBangla.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased ${timesNewRoman.variable} ${tiroBangla.variable} flex flex-col min-h-screen`}
       >
-        {children}
+        <Header />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
         <InstallPrompt />
       </body>
     </html>

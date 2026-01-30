@@ -32,15 +32,10 @@ export default async function AdminUploadPage() {
   return (
     <div className="min-h-screen bg-zinc-50">
       <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
-        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">
             Admin: Upload Quiz CSV
           </h1>
-          <div className="flex items-center gap-3">
-            <Link className="text-xs sm:text-sm font-medium text-blue-600 hover:underline" href="/">
-              Home
-            </Link>
-          </div>
         </div>
 
         <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
@@ -135,12 +130,6 @@ question,optionA,optionB,optionC,optionD,answer,hint
               ))
             )}
           </div>
-        </div>
-        
-        <div className="mt-6 sm:mt-8 text-center">
-          <p className="text-xs sm:text-sm text-zinc-500">
-            Developed by <span className="font-semibold text-zinc-700">Naeem</span>
-          </p>
         </div>
       </div>
     </div>

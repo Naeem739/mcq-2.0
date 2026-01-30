@@ -79,3 +79,4 @@ export async function updateQuizTitle(formData: FormData) {
     return { ok: false as const, error: "Failed to update quiz title." };
   }
 }
+

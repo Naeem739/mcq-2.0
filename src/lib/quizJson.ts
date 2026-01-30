@@ -59,7 +59,7 @@ export function parseQuizJson(jsonText: string): { questions: ParsedQuestion[]; 
       // Validate options
       let options: string[] = [];
       if (Array.isArray(item.options)) {
-        options = item.options.map((o) => String(o).trim()).filter(Boolean);
+        options = item.options.map((o: unknown) => String(o).trim()).filter(Boolean);
       } else if (item.optionA || item.optionB) {
         // Support optionA, optionB, optionC, optionD format
         const optionKeys = Object.keys(item)
