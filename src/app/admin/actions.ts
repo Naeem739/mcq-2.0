@@ -32,7 +32,6 @@ export async function uploadQuizAdmin(formData: FormData) {
           text: q.text,
           options: q.options,
           correctIndex: q.correctIndex,
-          hint: q.hint,
         })),
       },
     },
