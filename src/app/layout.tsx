@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { tiroBangla, timesNewRoman } from "@/lib/fonts";
+import InstallPrompt from "@/components/InstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MCQ Maker",
-  description: "Upload MCQs via CSV and practice them.",
+  title: "Quiz Practice - Student Learning Platform",
+  description: "Practice quizzes and improve your knowledge. Study smarter with interactive MCQ practice.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Quiz Practice",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -29,6 +47,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${timesNewRoman.variable} ${tiroBangla.variable}`}
       >
         {children}
+        <InstallPrompt />
       </body>
     </html>
   );

@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { uploadQuiz } from "./actions";
 import UploadForm from "./UploadForm";
 import { isAdminAuthed } from "@/lib/adminAuth";
-import { deleteQuizAdmin } from "../actions";
+import { deleteQuizAdmin, updateQuizTitle } from "../actions";
+import EditQuizTitle from "@/components/EditQuizTitle";
 
 export const dynamic = "force-dynamic";
 
@@ -30,21 +31,21 @@ export default async function AdminUploadPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
-            Admin: Upload MCQ CSV
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">
+            Admin: Upload Quiz CSV
           </h1>
           <div className="flex items-center gap-3">
-            <Link className="text-sm font-medium text-blue-600 hover:underline" href="/">
+            <Link className="text-xs sm:text-sm font-medium text-blue-600 hover:underline" href="/">
               Home
             </Link>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <p className="mb-4 text-sm text-zinc-600">
-            Upload a CSV with columns like: <span className="font-mono">question</span>,{" "}
+        <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+          <p className="mb-4 text-xs sm:text-sm text-zinc-600">
+            Upload a CSV file or paste JSON text. CSV format: <span className="font-mono">question</span>,{" "}
             <span className="font-mono">optionA</span>, <span className="font-mono">optionB</span>,{" "}
             <span className="font-mono">optionC</span>, <span className="font-mono">optionD</span>,{" "}
             <span className="font-mono">answer</span> (A/B/C/D or 1..N), optional{" "}
@@ -53,57 +54,93 @@ export default async function AdminUploadPage() {
 
           <UploadForm action={uploadQuiz} />
 
-          <details className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
-            <summary className="cursor-pointer text-sm font-medium text-zinc-800">
-              Show CSV example
+          <details className="mt-4 sm:mt-6 rounded-lg sm:rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-2 sm:py-3">
+            <summary className="cursor-pointer text-xs sm:text-sm font-medium text-zinc-800">
+              Show examples
             </summary>
-            <pre className="mt-3 overflow-x-auto rounded-lg bg-white p-3 text-xs text-zinc-800">
+            <div className="mt-2 sm:mt-3 space-y-3">
+              <div>
+                <p className="text-xs font-semibold text-zinc-800 mb-1">CSV Example:</p>
+                <pre className="overflow-x-auto rounded-lg bg-white p-2 sm:p-3 text-xs text-zinc-800">
 question,optionA,optionB,optionC,optionD,answer,hint
 "Sign Magnitude পদ্ধতিতে MSB 1 হলে সংখ্যাটি কী নির্দেশ করে?","ধনাত্মক","ঋণাত্মক","শূন্য","—","B","Sign bit = 1 means negative"
-            </pre>
+                </pre>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-zinc-800 mb-1">JSON Example:</p>
+                <pre className="overflow-x-auto rounded-lg bg-white p-2 sm:p-3 text-xs text-zinc-800">
+{`[
+  {
+    "text": "What is 2+2?",
+    "options": ["2", "3", "4", "5"],
+    "answer": "C",
+    "hint": "Basic math"
+  },
+  {
+    "text": "What is the capital of France?",
+    "options": ["London", "Berlin", "Paris", "Madrid"],
+    "answer": 2,
+    "hint": "City of lights"
+  }
+]`}
+                </pre>
+              </div>
+            </div>
           </details>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-zinc-900">Existing quizzes</h2>
-          <p className="mt-1 text-sm text-zinc-600">You can open or delete a quiz.</p>
+        <div className="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+          <h2 className="text-base sm:text-lg font-semibold text-zinc-900">Existing quizzes</h2>
+          <p className="mt-1 text-xs sm:text-sm text-zinc-600">You can edit title, open, or delete a quiz.</p>
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
             {quizzes.length === 0 ? (
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
+              <div className="rounded-lg sm:rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-600">
                 No quizzes yet.
               </div>
             ) : (
               quizzes.map((q: QuizWithCount) => (
                 <div
                   key={q.id}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3"
+                  className="flex flex-col gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3"
                 >
-                  <div className="min-w-0">
-                    <div className="truncate font-semibold text-zinc-900">{q.title}</div>
-                    <div className="text-xs text-zinc-500">{q._count.questions} questions</div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                    <EditQuizTitle
+                      quizId={q.id}
+                      currentTitle={q.title}
+                      action={updateQuizTitle}
+                    />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-50"
-                      href={`/practice/${q.id}`}
-                    >
-                      Open
-                    </Link>
-                    <form action={deleteQuizAdmin}>
-                      <input type="hidden" name="quizId" value={q.id} />
-                      <button
-                        className="rounded-xl bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
-                        type="submit"
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs text-zinc-500">{q._count.questions} {q._count.questions === 1 ? 'question' : 'questions'}</div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        className="rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 py-1.5 sm:py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 text-center transition-colors"
+                        href={`/practice/${q.id}`}
                       >
-                        Delete
-                      </button>
-                    </form>
+                        Open
+                      </Link>
+                      <form action={deleteQuizAdmin}>
+                        <input type="hidden" name="quizId" value={q.id} />
+                        <button
+                          className="rounded-lg sm:rounded-xl bg-red-600 px-3 py-1.5 sm:py-2 text-xs font-semibold text-white hover:bg-red-700 transition-colors"
+                          type="submit"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               ))
             )}
           </div>
+        </div>
+        
+        <div className="mt-6 sm:mt-8 text-center">
+          <p className="text-xs sm:text-sm text-zinc-500">
+            Developed by <span className="font-semibold text-zinc-700">Naeem</span>
+          </p>
         </div>
       </div>
     </div>

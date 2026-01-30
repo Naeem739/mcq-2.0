@@ -52,3 +52,30 @@ export async function deleteQuizAdmin(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function updateQuizTitle(formData: FormData) {
+  if (!(await isAdminAuthed())) redirect("/admin/login");
+
+  const quizId = String(formData.get("quizId") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+
+  if (!quizId) {
+    return { ok: false as const, error: "Quiz ID is required." };
+  }
+
+  if (!title) {
+    return { ok: false as const, error: "Title cannot be empty." };
+  }
+
+  try {
+    await prisma.quiz.update({
+      where: { id: quizId },
+      data: { title },
+    });
+    revalidatePath("/admin");
+    revalidatePath("/admin/upload");
+    revalidatePath("/");
+    return { ok: true as const };
+  } catch (error) {
+    return { ok: false as const, error: "Failed to update quiz title." };
+  }
+}

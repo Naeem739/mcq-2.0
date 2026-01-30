@@ -1,6 +1,8 @@
-## MCQ Maker (Next.js + PostgreSQL + Prisma)
+## Quiz Practice - Student Learning Platform (Next.js + PostgreSQL + Prisma)
 
 Features:
+- **Fully responsive** mobile-first design
+- **PWA support** with install prompt for mobile devices
 - **Admin CSV upload**: `http://localhost:3000/admin/upload`
 - **Practice UI** (progress + hint + next): `http://localhost:3000/practice/[quizId]`
 - **Quiz list** homepage: `http://localhost:3000`

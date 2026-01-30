@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { parseQuizCsv } from "@/lib/quizCsv";
+import { parseQuizJson } from "@/lib/quizJson";
 import { isAdminAuthed } from "@/lib/adminAuth";
 
 export async function uploadQuiz(formData: FormData) {
@@ -11,19 +12,46 @@ export async function uploadQuiz(formData: FormData) {
   }
 
   const title = String(formData.get("title") ?? "").trim();
+  const inputType = String(formData.get("inputType") ?? "csv");
   const file = formData.get("file");
+  const jsonText = String(formData.get("jsonText") ?? "").trim();
 
-  if (!(file instanceof File)) {
-    return { ok: false as const, error: "Please select a CSV file." };
+  let questions: Array<{
+    text: string;
+    options: string[];
+    correctIndex: number;
+    hint?: string;
+  }> = [];
+  let errors: string[] = [];
+
+  if (inputType === "json") {
+    if (!jsonText) {
+      return { ok: false as const, error: "Please provide JSON text." };
+    }
+    const result = parseQuizJson(jsonText);
+    questions = result.questions;
+    errors = result.errors;
+  } else {
+    // CSV mode
+    if (!(file instanceof File)) {
+      return { ok: false as const, error: "Please select a CSV file." };
+    }
+    const csvText = await file.text();
+    const result = parseQuizCsv(csvText);
+    questions = result.questions;
+    errors = result.errors;
   }
 
-  const csvText = await file.text();
-  const { questions, errors } = parseQuizCsv(csvText);
   if (errors.length) {
     return { ok: false as const, error: errors.slice(0, 8).join("\n") };
   }
 
-  const quizTitle = title || file.name.replace(/\.csv$/i, "");
+  if (questions.length === 0) {
+    return { ok: false as const, error: "No valid questions found." };
+  }
+
+  const quizTitle =
+    title || (inputType === "csv" && file instanceof File ? file.name.replace(/\.csv$/i, "") : "Untitled Quiz");
 
   const quiz = await prisma.quiz.create({
     data: {

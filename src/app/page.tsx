@@ -23,42 +23,48 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="mb-8 flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">MCQ Maker</h1>
-            <p className="mt-1 text-sm text-zinc-600">Upload MCQs and practice them like a quiz.</p>
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">Quiz Practice</h1>
+            <p className="mt-1 text-xs sm:text-sm text-zinc-600">Practice quizzes and improve your knowledge</p>
           </div>
           <Link
             href="/admin/upload"
-            className="rounded-2xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
+            className="w-full sm:w-auto rounded-xl sm:rounded-2xl bg-zinc-900 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 text-center transition-colors"
           >
             Admin Upload
           </Link>
         </div>
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
           {quizzes.length === 0 ? (
-            <div className="text-sm text-zinc-600">
-              No quizzes yet. Go to <Link className="text-blue-600 hover:underline" href="/admin/upload">Admin Upload</Link> to import a CSV.
+            <div className="text-xs sm:text-sm text-zinc-600">
+              No quizzes available yet. Go to <Link className="text-blue-600 hover:underline" href="/admin/upload">Admin Upload</Link> to import a CSV.
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {quizzes.map((q: QuizWithCount) => (
                 <Link
                   key={q.id}
                   href={`/practice/${q.id}`}
-                  className="block rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 hover:bg-zinc-100"
+                  className="block rounded-xl sm:rounded-2xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-3 sm:py-4 hover:bg-zinc-100 transition-colors"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="font-semibold text-zinc-900">{q.title}</div>
-                    <div className="text-sm font-medium text-zinc-600">
-                      {q._count.questions} questions
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                    <div className="font-semibold text-sm sm:text-base text-zinc-900 break-words">{q.title}</div>
+                    <div className="text-xs sm:text-sm font-medium text-zinc-600 whitespace-nowrap">
+                      {q._count.questions} {q._count.questions === 1 ? 'question' : 'questions'}
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
+        </div>
+        
+        <div className="mt-6 sm:mt-8 text-center">
+          <p className="text-xs sm:text-sm text-zinc-500">
+            Developed by <span className="font-semibold text-zinc-700">Naeem</span>
+          </p>
         </div>
       </div>
     </div>
