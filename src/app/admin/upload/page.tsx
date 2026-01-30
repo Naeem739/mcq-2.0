@@ -6,6 +6,7 @@ import UploadForm from "./UploadForm";
 import { isAdminAuthed } from "@/lib/adminAuth";
 import { deleteQuizAdmin, updateQuizTitle } from "../actions";
 import EditQuizTitle from "@/components/EditQuizTitle";
+import StudentPerformance from "@/components/StudentPerformance";
 
 export const dynamic = "force-dynamic";
 
@@ -29,107 +30,129 @@ export default async function AdminUploadPage() {
     include: { _count: { select: { questions: true } } },
   });
 
+  // Fetch all quiz attempts for performance analytics
+  const attempts = await prisma.quizAttempt.findMany({
+    include: {
+      quiz: {
+        select: { id: true, title: true },
+      },
+      user: {
+        select: { email: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  }) as any[];
+
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">
-            Admin: Upload Quiz CSV
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-12">
+        {/* Header Section */}
+        <div className="mb-8 sm:mb-12">
+          <div className="inline-block rounded-full bg-blue-100 px-4 py-1.5 mb-4">
+            <p className="text-xs sm:text-sm font-semibold text-blue-700">👨‍💼 Admin Dashboard</p>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
+            Quiz Management
           </h1>
+          <p className="text-base sm:text-lg text-slate-600">Create, manage, and monitor your quizzes</p>
         </div>
 
-        <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
-          <p className="mb-4 text-xs sm:text-sm text-zinc-600">
-            Upload a CSV file or paste JSON text. CSV format: <span className="font-mono">question</span>,{" "}
-            <span className="font-mono">optionA</span>, <span className="font-mono">optionB</span>,{" "}
-            <span className="font-mono">optionC</span>, <span className="font-mono">optionD</span>,{" "}
-            <span className="font-mono">answer</span> (A/B/C/D or 1..N), optional{" "}
-            <span className="font-mono">hint</span>.
-          </p>
+        {/* Upload Section */}
+        <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">📤 Upload Quiz</h2>
+            <p className="text-slate-600">Import questions from CSV or JSON format</p>
+          </div>
+          
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <p className="text-sm text-slate-700 font-medium">
+              <span className="font-semibold">CSV Format:</span> question, optionA, optionB, optionC, optionD, answer (A/B/C/D or 0-3)
+            </p>
+          </div>
 
           <UploadForm action={uploadQuiz} />
 
-          <details className="mt-4 sm:mt-6 rounded-lg sm:rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-2 sm:py-3">
-            <summary className="cursor-pointer text-xs sm:text-sm font-medium text-zinc-800">
-              Show examples
+          <details className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <summary className="cursor-pointer font-semibold text-slate-700 hover:text-slate-900 transition-colors">
+              ▶ Show file format examples
             </summary>
-            <div className="mt-2 sm:mt-3 space-y-3">
+            <div className="mt-4 space-y-4">
               <div>
-                <p className="text-xs font-semibold text-zinc-800 mb-1">CSV Example:</p>
-                <pre className="overflow-x-auto rounded-lg bg-white p-2 sm:p-3 text-xs text-zinc-800">
-question,optionA,optionB,optionC,optionD,answer,hint
-"Sign Magnitude পদ্ধতিতে MSB 1 হলে সংখ্যাটি কী নির্দেশ করে?","ধনাত্মক","ঋণাত্মক","শূন্য","—","B","Sign bit = 1 means negative"
+                <p className="text-sm font-bold text-slate-900 mb-2">CSV Example:</p>
+                <pre className="overflow-x-auto rounded-lg bg-white p-3 text-xs text-slate-800 border border-slate-200">
+question,optionA,optionB,optionC,optionD,answer
+"What is the capital of France?","London","Berlin","Paris","Madrid","C"
+"2 + 2 = ?","2","3","4","5","C"
                 </pre>
               </div>
               <div>
-                <p className="text-xs font-semibold text-zinc-800 mb-1">JSON Example:</p>
-                <pre className="overflow-x-auto rounded-lg bg-white p-2 sm:p-3 text-xs text-zinc-800">
-{`[
-  {
-    "text": "What is 2+2?",
-    "options": ["2", "3", "4", "5"],
-    "answer": "C",
-    "hint": "Basic math"
-  },
-  {
-    "text": "What is the capital of France?",
-    "options": ["London", "Berlin", "Paris", "Madrid"],
-    "answer": 2,
-    "hint": "City of lights"
-  }
-]`}
+                <p className="text-sm font-bold text-slate-900 mb-2">JSON Example:</p>
+                <pre className="overflow-x-auto rounded-lg bg-white p-3 text-xs text-slate-800 border border-slate-200">
+{`[\\n  {\\n    "text": "What is 2+2?",\\n    "options": ["2", "3", "4", "5"],\\n    "answer": "C"\\n  },\\n  {\\n    "text": "What is the capital of France?",\\n    "options": ["London", "Berlin", "Paris", "Madrid"],\\n    "answer": 2\\n  }\\n]`}
                 </pre>
               </div>
             </div>
           </details>
         </div>
 
-        <div className="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
-          <h2 className="text-base sm:text-lg font-semibold text-zinc-900">Existing quizzes</h2>
-          <p className="mt-1 text-xs sm:text-sm text-zinc-600">You can edit title, open, or delete a quiz.</p>
+        {/* Existing Quizzes Section */}
+        <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-1">📚 Existing Quizzes</h2>
+            <p className="text-slate-600">Edit, open, or delete quizzes from your library</p>
+          </div>
 
-          <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
-            {quizzes.length === 0 ? (
-              <div className="rounded-lg sm:rounded-xl border border-zinc-200 bg-zinc-50 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-600">
-                No quizzes yet.
-              </div>
-            ) : (
-              quizzes.map((q: QuizWithCount) => (
+          {quizzes.length === 0 ? (
+            <div className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+              <div className="text-4xl mb-3">🗂️</div>
+              <p className="text-lg font-medium text-slate-900 mb-2">No Quizzes Yet</p>
+              <p className="text-slate-600">Upload your first quiz using the form above</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {quizzes.map((q: QuizWithCount) => (
                 <div
                   key={q.id}
-                  className="flex flex-col gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3"
+                  className="group rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-5 hover:shadow-lg hover:border-blue-300 transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                  <div className="mb-4">
                     <EditQuizTitle
                       quizId={q.id}
                       currentTitle={q.title}
                       action={updateQuizTitle}
                     />
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-xs text-zinc-500">{q._count.questions} {q._count.questions === 1 ? 'question' : 'questions'}</div>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        className="rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 py-1.5 sm:py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 text-center transition-colors"
-                        href={`/practice/${q.id}`}
-                      >
-                        Open
-                      </Link>
-                      <form action={deleteQuizAdmin}>
-                        <input type="hidden" name="quizId" value={q.id} />
-                        <button
-                          className="rounded-lg sm:rounded-xl bg-red-600 px-3 py-1.5 sm:py-2 text-xs font-semibold text-white hover:bg-red-700 transition-colors"
-                          type="submit"
-                        >
-                          Delete
-                        </button>
-                      </form>
+                    <div className="mt-2 inline-flex items-center gap-2 text-sm text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+                      <span>❓</span>
+                      <span className="font-semibold">{q._count.questions}</span>
+                      <span>{q._count.questions === 1 ? 'question' : 'questions'}</span>
                     </div>
                   </div>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <Link
+                      className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 text-center transition-colors"
+                      href={`/practice/${q.id}`}
+                    >
+                      👁 Open
+                    </Link>
+                    <form action={deleteQuizAdmin} className="flex-1">
+                      <input type="hidden" name="quizId" value={q.id} />
+                      <button
+                        className="w-full rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+                        type="submit"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </form>
+                  </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Student Performance Section */}
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg">
+          <StudentPerformance attempts={attempts} quizzes={quizzes} />
         </div>
       </div>
     </div>

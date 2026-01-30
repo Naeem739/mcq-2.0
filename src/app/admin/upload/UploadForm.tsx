@@ -12,7 +12,6 @@ export default function UploadForm({
   const [inputType, setInputType] = useState<"csv" | "json">("csv");
   const [state, formAction, pending] = useActionState<UploadResult, FormData>(
     async (_prevState, formData) => {
-      // Add input type to form data
       formData.set("inputType", inputType);
       return action(formData);
     },
@@ -20,73 +19,76 @@ export default function UploadForm({
   );
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5">
       {state?.ok === false ? (
-        <div className="whitespace-pre-wrap rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {state.error}
+        <div className="whitespace-pre-wrap rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 font-medium">
+          ⚠️ {state.error}
         </div>
       ) : null}
 
       <div>
-        <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">Quiz title</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-900">Quiz Title</label>
         <input
           name="title"
           placeholder="e.g. Digital Logic (Sign Magnitude)"
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         />
       </div>
 
-      {/* Input Type Selector */}
       <div>
-        <label className="mb-2 block text-xs sm:text-sm font-medium text-zinc-800">Input Type</label>
-        <div className="flex gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
+        <label className="mb-3 block text-sm font-semibold text-slate-900">Input Format</label>
+        <div className="flex gap-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <label className="flex items-center gap-3 cursor-pointer flex-1 p-3 rounded-lg hover:bg-white transition-colors">
             <input
               type="radio"
               name="inputType"
               value="csv"
               checked={inputType === "csv"}
               onChange={(e) => setInputType(e.target.value as "csv" | "json")}
-              className="w-4 h-4 text-blue-600 border-zinc-300 focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600"
             />
-            <span className="text-xs sm:text-sm text-zinc-700">CSV File</span>
+            <div>
+              <div className="font-medium text-slate-900">📄 CSV File</div>
+              <div className="text-xs text-slate-600">Upload .csv file</div>
+            </div>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer flex-1 p-3 rounded-lg hover:bg-white transition-colors">
             <input
               type="radio"
               name="inputType"
               value="json"
               checked={inputType === "json"}
               onChange={(e) => setInputType(e.target.value as "csv" | "json")}
-              className="w-4 h-4 text-blue-600 border-zinc-300 focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600"
             />
-            <span className="text-xs sm:text-sm text-zinc-700">JSON Text</span>
+            <div>
+              <div className="font-medium text-slate-900">{ } JSON</div>
+              <div className="text-xs text-slate-600">Paste JSON text</div>
+            </div>
           </label>
         </div>
       </div>
 
-      {/* CSV File Input */}
       {inputType === "csv" && (
         <div>
-          <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">CSV file</label>
+          <label className="mb-2 block text-sm font-semibold text-slate-900">Select CSV File</label>
           <input
             name="file"
             type="file"
             accept=".csv,text/csv"
-            className="block w-full text-xs sm:text-sm file:mr-2 sm:file:mr-4 file:rounded-lg sm:file:rounded-xl file:border-0 file:bg-zinc-900 file:px-3 sm:file:px-4 file:py-1.5 sm:file:py-2 file:text-xs sm:file:text-sm file:font-medium file:text-white hover:file:bg-zinc-800"
+            className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-600 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700 transition-all cursor-pointer"
           />
         </div>
       )}
 
-      {/* JSON Text Input */}
       {inputType === "json" && (
         <div>
-          <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">JSON Text</label>
+          <label className="mb-2 block text-sm font-semibold text-slate-900">Paste JSON Text</label>
           <textarea
             name="jsonText"
-            rows={12}
-            placeholder='[\n  {\n    "text": "What is 2+2?",\n    "options": ["2", "3", "4", "5"],\n    "answer": "C",\n    "hint": "Basic math"\n  }\n]'
-            className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-mono outline-none ring-blue-500 focus:ring-2 resize-y"
+            rows={10}
+            placeholder='[\n  {\n    "text": "What is 2+2?",\n    "options": ["2", "3", "4", "5"],\n    "answer": "C"\n  }\n]'
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-mono outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
           />
         </div>
       )}
@@ -94,9 +96,9 @@ export default function UploadForm({
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl sm:rounded-2xl bg-blue-600 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
+        className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
       >
-        {pending ? "Uploading..." : "Create Quiz"}
+        {pending ? "⏳ Uploading..." : "✨ Create Quiz"}
       </button>
     </form>
   );

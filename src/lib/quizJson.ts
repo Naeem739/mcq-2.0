@@ -84,13 +84,10 @@ export function parseQuizJson(jsonText: string): { questions: ParsedQuestion[]; 
         return;
       }
 
-      const hint = item.hint || item.explanation || undefined;
-
       questions.push({
         text,
         options,
         correctIndex,
-        hint: hint ? String(hint).trim() : undefined,
       });
     });
 

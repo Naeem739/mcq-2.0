@@ -8,11 +8,45 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String     // hashed
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  attempts  QuizAttempt[]
+}
+
 model Quiz {
   id        String     @id @default(cuid())
   title     String
   createdAt DateTime   @default(now())
   questions Question[]
+  attempts  QuizAttempt[]
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  studentName String
+  totalQuestions Int
+  correctAnswers Int
+  wrongAnswers Int
+  skippedQuestions Int
+  
+  startTime   DateTime
+  endTime     DateTime
+  totalTimeSeconds Int
+  
+  createdAt   DateTime @default(now())
+
+  @@index([quizId])
+  @@index([userId])
 }
 
 model Question {
@@ -23,7 +57,6 @@ model Question {
   text         String
   options      Json     // string[]
   correctIndex Int
-  hint         String?
 
   createdAt    DateTime @default(now())
 

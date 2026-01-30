@@ -4,7 +4,6 @@ export type ParsedQuestion = {
   text: string;
   options: string[];
   correctIndex: number;
-  hint?: string;
 };
 
 function pickFirstKey(obj: Record<string, unknown>, keys: string[]) {
@@ -69,7 +68,6 @@ export function parseQuizCsv(csvText: string): { questions: ParsedQuestion[]; er
 
     const qKey = pickFirstKey(row, ["question", "q", "Question", "QUESTION"]);
     const aKey = pickFirstKey(row, ["answer", "ans", "correct", "Answer", "ANS"]);
-    const hKey = pickFirstKey(row, ["hint", "Hint", "explanation", "Explanation"]);
 
     const text = normalizeCell(qKey ? row[qKey] : "");
     if (!text) {
@@ -113,13 +111,10 @@ export function parseQuizCsv(csvText: string): { questions: ParsedQuestion[]; er
       return;
     }
 
-    const hint = normalizeCell(hKey ? row[hKey] : "");
-
     questions.push({
       text,
       options,
       correctIndex,
-      hint: hint || undefined,
     });
   });
 

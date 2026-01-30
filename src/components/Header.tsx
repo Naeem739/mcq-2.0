@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { getUserFromCookie } from "@/lib/auth";
+import AuthNav from "./AuthNav";
 
-export default function Header() {
+export default async function Header() {
+  const user = await getUserFromCookie();
+
   return (
     <header className="border-b border-zinc-200 bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -36,6 +40,14 @@ export default function Header() {
             >
               Home
             </Link>
+            {user && (
+              <Link
+                href="/profile"
+                className="text-sm font-medium text-zinc-700 hover:text-blue-600 transition-colors"
+              >
+                Profile
+              </Link>
+            )}
             <Link
               href="/admin/upload"
               className="text-sm font-medium text-zinc-700 hover:text-blue-600 transition-colors"
@@ -44,13 +56,16 @@ export default function Header() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2 md:hidden">
-            <Link
-              href="/"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
-            >
-              Home
-            </Link>
+          <div className="flex items-center gap-4">
+            <AuthNav user={user} />
+            <div className="flex items-center gap-2 md:hidden">
+              <Link
+                href="/"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
+              >
+                Home
+              </Link>
+            </div>
           </div>
         </div>
       </div>
