@@ -74,6 +74,12 @@ export default async function Header() {
                 Profile
               </Link>
             )}
+            <Link
+              href="/admin/upload"
+              className="rounded px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
+            >
+              Admin
+            </Link>
           </div>
 
           {/* Auth Component - Right */}
