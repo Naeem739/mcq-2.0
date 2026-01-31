@@ -9,6 +9,8 @@ import { isAdminAuthed, getAdminSiteId } from "@/lib/adminAuth";
 
 export async function uploadQuizAdmin(formData: FormData) {
   if (!(await isAdminAuthed())) redirect("/admin/login");
+  const siteId = await getAdminSiteId();
+  if (!siteId) redirect("/admin/login");
 
   const title = String(formData.get("title") ?? "").trim();
   const file = formData.get("file");
@@ -28,6 +30,7 @@ export async function uploadQuizAdmin(formData: FormData) {
   await prisma.quiz.create({
     data: {
       title: quizTitle,
+      siteId: siteId,
       questions: {
         create: questions.map((q) => ({
           text: q.text,
@@ -44,6 +47,8 @@ export async function uploadQuizAdmin(formData: FormData) {
 
 export async function deleteQuizAdmin(formData: FormData) {
   if (!(await isAdminAuthed())) redirect("/admin/login");
+  const siteId = await getAdminSiteId();
+  if (!siteId) redirect("/admin/login");
 
   const quizId = String(formData.get("quizId") ?? "");
   if (!quizId) return { ok: false as const, error: "Quiz ID is required" };
@@ -60,6 +65,8 @@ export async function deleteQuizAdmin(formData: FormData) {
 
 export async function updateQuizTitle(formData: FormData) {
   if (!(await isAdminAuthed())) redirect("/admin/login");
+  const siteId = await getAdminSiteId();
+  if (!siteId) redirect("/admin/login");
 
   const quizId = String(formData.get("quizId") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
