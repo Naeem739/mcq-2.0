@@ -178,3 +178,20 @@ export async function updateQuizContent(formData: FormData) {
     return { ok: false as const, error: "Failed to update quiz." };
   }
 }
+
+export async function deleteQuizAttempt(formData: FormData) {
+  if (!(await isAdminAuthed())) redirect("/admin/login");
+  const siteId = await getAdminSiteId();
+  if (!siteId) redirect("/admin/login");
+
+  const attemptId = String(formData.get("attemptId") ?? "");
+  if (!attemptId) return { ok: false as const, error: "Attempt ID is required" };
+
+  try {
+    await prisma.quizAttempt.delete({ where: { id: attemptId } });
+    revalidatePath("/admin/upload");
+    return { ok: true as const, message: "Attempt deleted successfully" };
+  } catch (error) {
+    return { ok: false as const, error: "Failed to delete attempt" };
+  }
+}

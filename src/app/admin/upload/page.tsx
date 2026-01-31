@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { uploadQuiz } from "./actions";
 import UploadForm from "./UploadForm";
 import { isAdminAuthed, getAdminSiteId } from "@/lib/adminAuth";
-import { deleteQuizAdmin, updateQuizTitle, updateQuizContent } from "../actions";
+import { deleteQuizAdmin, updateQuizTitle, updateQuizContent, deleteQuizAttempt } from "../actions";
 import { adminLogout } from "../login/actions";
 import EditQuizTitle from "@/components/EditQuizTitle";
 import StudentPerformance from "@/components/StudentPerformance";
@@ -163,7 +163,7 @@ question,optionA,optionB,optionC,optionD,answer
 
         {/* Student Performance Section */}
         <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg">
-          <StudentPerformance attempts={attempts} quizzes={quizzes} />
+          <StudentPerformance attempts={attempts} quizzes={quizzes} deleteAction={deleteQuizAttempt} />
         </div>
       </div>
     </div>

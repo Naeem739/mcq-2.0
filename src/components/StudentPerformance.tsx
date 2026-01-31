@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
+import { toast } from "sonner";
 
 type QuizAttempt = {
   id: string;
@@ -27,14 +28,40 @@ type AttemptWithRank = QuizAttempt & {
   rank: number;
 };
 
+type DeleteResult = { ok: false; error: string } | { ok: true; message?: string } | undefined;
+
 export default function StudentPerformance({
   attempts,
   quizzes,
+  deleteAction,
 }: {
   attempts: QuizAttempt[];
   quizzes: Array<{ id: string; title: string }>;
+  deleteAction: (formData: FormData) => Promise<DeleteResult>;
 }) {
   const [selectedQuizId, setSelectedQuizId] = useState<string>("all");
+  const [isPending, startTransition] = useTransition();
+
+  const handleDelete = (attemptId: string, studentName: string) => {
+    if (!confirm(`Are you sure you want to delete ${studentName}'s attempt? This action cannot be undone.`)) {
+      return;
+    }
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("attemptId", attemptId);
+
+      const result = await deleteAction(formData);
+
+      if (result?.ok === false) {
+        toast.error("Delete Failed", {
+          description: result.error,
+        });
+      } else if (result?.ok === true) {
+        toast.success(result.message || "Attempt deleted successfully");
+      }
+    });
+  };
 
   const filteredAttempts = useMemo(() => {
     if (selectedQuizId === "all") return attempts;
@@ -159,6 +186,7 @@ export default function StudentPerformance({
                   Test Time
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-zinc-700">Email</th>
+                <th className="px-4 py-3 text-center font-semibold text-zinc-700">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -201,11 +229,20 @@ export default function StudentPerformance({
                     <td className="px-4 py-3 text-zinc-600 text-sm">
                       {attempt.user?.email || "N/A"}
                     </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => handleDelete(attempt.id, attempt.studentName)}
+                        disabled={isPending}
+                        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-zinc-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-zinc-500">
                     No quiz attempts yet
                   </td>
                 </tr>
