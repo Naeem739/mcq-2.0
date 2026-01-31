@@ -40,7 +40,7 @@ export default function UploadForm({
         <input
           name="title"
           placeholder="e.g. Digital Logic (Sign Magnitude)"
-          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         />
       </div>
 
@@ -97,7 +97,7 @@ export default function UploadForm({
             name="jsonText"
             rows={10}
             placeholder='[\n  {\n    "text": "What is 2+2?",\n    "options": ["2", "3", "4", "5"],\n    "answer": "C"\n  }\n]'
-            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-mono outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 font-mono outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
           />
         </div>
       )}

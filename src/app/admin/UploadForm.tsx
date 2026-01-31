@@ -90,7 +90,7 @@ export default function UploadForm({
             name="jsonText"
             rows={12}
             placeholder='[\n  {\n    "text": "What is 2+2?",\n    "options": ["2", "3", "4", "5"],\n    "answer": "C",\n    "hint": "Basic math"\n  }\n]'
-            className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-mono outline-none ring-blue-500 focus:ring-2 resize-y"
+            className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 font-mono outline-none ring-blue-500 focus:ring-2 resize-y"
           />
         </div>
       )}

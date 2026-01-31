@@ -43,7 +43,7 @@ export default function SignupForm({
           autoFocus
           required
           placeholder="John Doe"
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
         />
       </div>
 
@@ -54,7 +54,7 @@ export default function SignupForm({
           type="email"
           required
           placeholder="you@example.com"
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
         />
       </div>
 
@@ -66,7 +66,7 @@ export default function SignupForm({
           required
           minLength={6}
           placeholder="At least 6 characters"
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
         />
       </div>
 
@@ -78,7 +78,7 @@ export default function SignupForm({
           required
           minLength={6}
           placeholder="Repeat password"
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
         />
       </div>
 
@@ -89,7 +89,7 @@ export default function SignupForm({
           type="text"
           required
           placeholder="Enter your site code"
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2 uppercase"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2 uppercase"
         />
         <p className="mt-1 text-xs text-zinc-500">Ask your administrator for the site code</p>
       </div>

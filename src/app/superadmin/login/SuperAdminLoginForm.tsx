@@ -32,7 +32,7 @@ export default function SuperAdminLoginForm({
           autoFocus
           required
           placeholder="Enter super admin password"
-          className="w-full rounded-lg sm:rounded-xl border border-slate-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-slate-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
         />
       </div>
 

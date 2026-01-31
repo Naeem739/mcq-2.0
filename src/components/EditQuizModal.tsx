@@ -146,7 +146,7 @@ export default function EditQuizModal({
               onChange={(e) => setTitle(e.target.value)}
               required
               placeholder="e.g. Digital Logic Quiz"
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
 
@@ -255,7 +255,7 @@ export default function EditQuizModal({
                   rows={15}
                   required
                   defaultValue={existingQuestionsJson}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-mono outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 font-mono outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
                 />
                 <p className="mt-2 text-xs text-slate-600">
                   Format: answer can be 0-3 (index) or "A"-"D" (letter)

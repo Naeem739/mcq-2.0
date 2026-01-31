@@ -43,7 +43,7 @@ export default function LoginForm({
           type="email"
           autoFocus
           required
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
           placeholder="admin@example.com"
         />
       </div>
@@ -54,7 +54,7 @@ export default function LoginForm({
           name="password"
           type="password"
           required
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2"
           placeholder="Enter your password"
         />
       </div>
@@ -65,7 +65,7 @@ export default function LoginForm({
           name="siteCode"
           type="text"
           required
-          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2 font-mono uppercase"
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-900 outline-none ring-blue-500 focus:ring-2 font-mono uppercase"
           placeholder="Enter your 12-digit site code"
           maxLength={12}
         />
