@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
+import { toast } from "sonner";
 
 type UploadResult = { ok: false; error: string } | undefined;
 
@@ -17,6 +18,14 @@ export default function UploadForm({
     },
     undefined,
   );
+
+  useEffect(() => {
+    if (state?.ok === false) {
+      toast.error("Upload Failed", {
+        description: state.error,
+      });
+    }
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-5">

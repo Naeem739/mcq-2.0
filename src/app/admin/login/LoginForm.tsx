@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
 type LoginResult = { ok: false; error: string } | undefined;
 
@@ -19,6 +20,14 @@ export default function LoginForm({
     undefined,
   );
 
+  useEffect(() => {
+    if (state?.ok === false) {
+      toast.error("Login Failed", {
+        description: state.error,
+      });
+    }
+  }, [state]);
+
   return (
     <form action={formAction} className="space-y-4">
       {state?.ok === false ? (
@@ -28,14 +37,39 @@ export default function LoginForm({
       ) : null}
 
       <div>
-        <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">Admin password</label>
+        <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">Email</label>
         <input
-          name="password"
-          type="password"
+          name="email"
+          type="email"
           autoFocus
           required
           className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          placeholder="admin@example.com"
         />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">Password</label>
+        <input
+          name="password"
+          type="password"
+          required
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2"
+          placeholder="Enter your password"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-xs sm:text-sm font-medium text-zinc-800">Site Code</label>
+        <input
+          name="siteCode"
+          type="text"
+          required
+          className="w-full rounded-lg sm:rounded-xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm outline-none ring-blue-500 focus:ring-2 font-mono uppercase"
+          placeholder="Enter your 12-digit site code"
+          maxLength={12}
+        />
+        <p className="mt-1 text-xs text-zinc-500">Enter the site code assigned by Super Admin</p>
       </div>
 
       <button

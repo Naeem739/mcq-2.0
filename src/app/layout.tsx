@@ -5,6 +5,7 @@ import { tiroBangla, timesNewRoman } from "@/lib/fonts";
 import InstallPrompt from "@/components/InstallPrompt";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,6 +49,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${timesNewRoman.variable} ${tiroBangla.variable} flex flex-col min-h-screen`}
       >
+        <Toaster position="top-right" richColors closeButton />
         <Header />
         <main className="flex-1">
           {children}

@@ -4,10 +4,14 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { parseQuizCsv } from "@/lib/quizCsv";
 import { parseQuizJson } from "@/lib/quizJson";
-import { isAdminAuthed } from "@/lib/adminAuth";
+import { isAdminAuthed, getAdminSiteId } from "@/lib/adminAuth";
 
 export async function uploadQuiz(formData: FormData) {
   if (!(await isAdminAuthed())) {
+    return { ok: false as const, error: "Not authorized. Please login to admin first." };
+  }
+  const siteId = await getAdminSiteId();
+  if (!siteId) {
     return { ok: false as const, error: "Not authorized. Please login to admin first." };
   }
 
@@ -53,21 +57,26 @@ export async function uploadQuiz(formData: FormData) {
   const quizTitle =
     title || (inputType === "csv" && file instanceof File ? file.name.replace(/\.csv$/i, "") : "Untitled Quiz");
 
-  const quiz = await prisma.quiz.create({
-    data: {
-      title: quizTitle,
-      questions: {
-        create: questions.map((q) => ({
-          text: q.text,
-          options: q.options,
-          correctIndex: q.correctIndex,
-          hint: q.hint,
-        })),
+  try {
+    const quiz = await prisma.quiz.create({
+      data: {
+        title: quizTitle,
+        siteId: siteId,
+        questions: {
+          create: questions.map((q) => ({
+            text: q.text,
+            options: q.options,
+            correctIndex: q.correctIndex,
+            hint: q.hint,
+          })),
+        },
       },
-    },
-    select: { id: true },
-  });
+      select: { id: true },
+    });
 
-  redirect(`/practice/${quiz.id}`);
+    redirect(`/practice/${quiz.id}`);
+  } catch (error) {
+    return { ok: false as const, error: "Failed to create quiz. Please try again." };
+  }
 }
 

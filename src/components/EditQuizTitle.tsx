@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import { toast } from "sonner";
 
 type UpdateResult = { ok: false; error: string } | { ok: true } | undefined;
 
@@ -43,9 +44,13 @@ export default function EditQuizTitle({
 
       if (result?.ok === false) {
         setError(result.error);
+        toast.error("Update Failed", {
+          description: result.error,
+        });
       } else if (result?.ok === true) {
         setIsEditing(false);
         setError(null);
+        toast.success("Quiz title updated successfully");
       }
     });
   };

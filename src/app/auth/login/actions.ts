@@ -7,14 +7,32 @@ import { verifyPassword, setUserCookie, clearUserCookie } from "@/lib/auth";
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
+  const siteCode = String(formData.get("siteCode") ?? "").trim().toUpperCase();
 
   if (!email || !password) {
     return { ok: false as const, error: "Email and password are required" };
   }
+  if (!siteCode) {
+    return { ok: false as const, error: "Site code is required" };
+  }
 
   try {
+    // Find site by code
+    const site = await prisma.site.findUnique({
+      where: { code: siteCode },
+    });
+
+    if (!site) {
+      return { ok: false as const, error: "Invalid site code" };
+    }
+
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: {
+        siteId_email: {
+          siteId: site.id,
+          email: email,
+        },
+      },
     });
 
     if (!user) {
@@ -25,8 +43,8 @@ export async function loginAction(formData: FormData) {
       return { ok: false as const, error: "Invalid email or password" };
     }
 
-    // Set user cookie
-    await setUserCookie(user.id, user.email, user.name);
+    // Set user cookie with siteId
+    await setUserCookie(user.id, user.email, user.name, user.siteId);
     redirect("/");
   } catch (error) {
     // Re-throw redirect errors (NEXT_REDIRECT is a special Next.js error)

@@ -3,10 +3,13 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { uploadQuiz } from "./actions";
 import UploadForm from "./UploadForm";
-import { isAdminAuthed } from "@/lib/adminAuth";
-import { deleteQuizAdmin, updateQuizTitle } from "../actions";
+import { isAdminAuthed, getAdminSiteId } from "@/lib/adminAuth";
+import { deleteQuizAdmin, updateQuizTitle, updateQuizContent } from "../actions";
+import { adminLogout } from "../login/actions";
 import EditQuizTitle from "@/components/EditQuizTitle";
 import StudentPerformance from "@/components/StudentPerformance";
+import DeleteQuizButton from "@/components/DeleteQuizButton";
+import QuizCard from "@/components/QuizCard";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +20,12 @@ type QuizWithCount = {
   id: string;
   title: string;
   createdAt: Date;
+  questions: {
+    id: string;
+    text: string;
+    options: string[];
+    correctIndex: number;
+  }[];
   _count: {
     questions: number;
   };
@@ -24,14 +33,32 @@ type QuizWithCount = {
 
 export default async function AdminUploadPage() {
   if (!(await isAdminAuthed())) redirect("/admin/login?next=/admin/upload");
+  const siteId = await getAdminSiteId();
+  if (!siteId) redirect("/admin/login?next=/admin/upload");
 
   const quizzes = await prisma.quiz.findMany({
+    where: { siteId },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { questions: true } } },
+    include: { 
+      _count: { select: { questions: true } },
+      questions: {
+        select: {
+          id: true,
+          text: true,
+          options: true,
+          correctIndex: true,
+        },
+      },
+    },
   });
 
-  // Fetch all quiz attempts for performance analytics
+  // Fetch all quiz attempts for performance analytics (only for this site)
   const attempts = await prisma.quizAttempt.findMany({
+    where: {
+      quiz: {
+        siteId: siteId,
+      },
+    },
     include: {
       quiz: {
         select: { id: true, title: true },
@@ -51,10 +78,22 @@ export default async function AdminUploadPage() {
           <div className="inline-block rounded-full bg-blue-100 px-4 py-1.5 mb-4">
             <p className="text-xs sm:text-sm font-semibold text-blue-700">👨‍💼 Admin Dashboard</p>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-            Quiz Management
-          </h1>
-          <p className="text-base sm:text-lg text-slate-600">Create, manage, and monitor your quizzes</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
+                Quiz Management
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600">Create, manage, and monitor your quizzes</p>
+            </div>
+            <form action={adminLogout}>
+              <button
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                type="submit"
+              >
+                Admin Logout
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Upload Section */}
@@ -74,7 +113,7 @@ export default async function AdminUploadPage() {
 
           <details className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
             <summary className="cursor-pointer font-semibold text-slate-700 hover:text-slate-900 transition-colors">
-              ▶ Show file format examples
+              📄 Show file format examples
             </summary>
             <div className="mt-4 space-y-4">
               <div>
@@ -111,40 +150,12 @@ question,optionA,optionB,optionC,optionD,answer
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {quizzes.map((q: QuizWithCount) => (
-                <div
+                <QuizCard
                   key={q.id}
-                  className="group rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-5 hover:shadow-lg hover:border-blue-300 transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="mb-4">
-                    <EditQuizTitle
-                      quizId={q.id}
-                      currentTitle={q.title}
-                      action={updateQuizTitle}
-                    />
-                    <div className="mt-2 inline-flex items-center gap-2 text-sm text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-                      <span>❓</span>
-                      <span className="font-semibold">{q._count.questions}</span>
-                      <span>{q._count.questions === 1 ? 'question' : 'questions'}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                    <Link
-                      className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 text-center transition-colors"
-                      href={`/practice/${q.id}`}
-                    >
-                      👁 Open
-                    </Link>
-                    <form action={deleteQuizAdmin} className="flex-1">
-                      <input type="hidden" name="quizId" value={q.id} />
-                      <button
-                        className="w-full rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
-                        type="submit"
-                      >
-                        🗑️ Delete
-                      </button>
-                    </form>
-                  </div>
-                </div>
+                  quiz={q}
+                  updateContentAction={updateQuizContent}
+                  deleteAction={deleteQuizAdmin}
+                />
               ))}
             </div>
           )}

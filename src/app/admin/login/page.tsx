@@ -8,7 +8,7 @@ export default async function AdminLoginPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const sp = await searchParams;
-  const nextPath = typeof sp.next === "string" ? sp.next : "/admin";
+  const nextPath = typeof sp.next === "string" ? sp.next : "/admin/upload";
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -22,9 +22,14 @@ export default async function AdminLoginPage({
 
         <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm">
           <LoginForm nextPath={nextPath} action={adminLogin} />
-          <p className="mt-4 text-xs text-zinc-500">
-            Tip: set <span className="font-mono">ADMIN_PASSWORD</span> in your <span className="font-mono">.env</span>.
-          </p>
+          <div className="mt-6 border-t border-zinc-200 pt-6">
+            <p className="text-center text-xs sm:text-sm text-zinc-600">
+              Don't have admin access?{" "}
+              <Link href="/admin/request" className="font-semibold text-blue-700 hover:underline">
+                Request Admin Access
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

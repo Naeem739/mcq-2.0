@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { submitQuizAttempt } from "./submitActions";
 
 export type PracticeQuestion = {
@@ -109,7 +110,18 @@ export default function PracticeClient({
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
         totalTimeSeconds: timeTaken,
-      }).catch(err => console.error("Failed to submit quiz:", err));
+      }).then(result => {
+        if (result.ok) {
+          toast.success("Quiz submitted successfully!");
+        } else {
+          toast.error("Failed to save quiz", {
+            description: result.error,
+          });
+        }
+      }).catch(err => {
+        console.error("Failed to submit quiz:", err);
+        toast.error("Failed to save quiz");
+      });
     }
   }, [showResult, submitted, quizId, studentName, total, correctCount, wrongCount, skipCount, startTime]);
 

@@ -9,21 +9,37 @@ export async function signupAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
+  const siteCode = String(formData.get("siteCode") ?? "").trim().toUpperCase();
 
   // Validation
   if (!name) return { ok: false as const, error: "Name is required" };
   if (!email || !email.includes("@")) return { ok: false as const, error: "Valid email is required" };
   if (!password || password.length < 6) return { ok: false as const, error: "Password must be at least 6 characters" };
   if (password !== confirmPassword) return { ok: false as const, error: "Passwords do not match" };
+  if (!siteCode) return { ok: false as const, error: "Site code is required" };
 
   try {
-    // Check if user already exists
+    // Find site by code
+    const site = await prisma.site.findUnique({
+      where: { code: siteCode },
+    });
+
+    if (!site) {
+      return { ok: false as const, error: "Invalid site code" };
+    }
+
+    // Check if user already exists in this site
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: {
+        siteId_email: {
+          siteId: site.id,
+          email: email,
+        },
+      },
     });
 
     if (existingUser) {
-      return { ok: false as const, error: "Email already registered" };
+      return { ok: false as const, error: "Email already registered in this site" };
     }
 
     // Create user with hashed password
@@ -33,11 +49,12 @@ export async function signupAction(formData: FormData) {
         name,
         email,
         password: hashedPassword,
+        siteId: site.id,
       },
     });
 
     // Auto-login user
-    await setUserCookie(user.id, user.email, user.name);
+    await setUserCookie(user.id, user.email, user.name, site.id);
 
     // Redirect to home
     redirect("/");

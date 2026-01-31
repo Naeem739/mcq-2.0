@@ -8,22 +8,73 @@ datasource db {
   provider = "postgresql"
 }
 
+model Site {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique // Site code for user registration (12-digit)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  admins         Admin[]
+  users          User[]
+  quizzes        Quiz[]
+  adminRequests  AdminRequest[]
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  password  String   // hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email])
+  @@index([siteId])
+}
+
+model AdminRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String   // hashed
+  status    String   @default("pending") // pending, approved, rejected
+  siteCode  String?  // Assigned by super admin
+  siteId    String?  // Created site ID after approval
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
 model User {
   id        String     @id @default(cuid())
+  siteId    String
+  site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
   name      String
-  email     String     @unique
+  email     String
   password  String     // hashed
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   attempts  QuizAttempt[]
+
+  @@unique([siteId, email])
+  @@index([siteId])
 }
 
 model Quiz {
   id        String     @id @default(cuid())
+  siteId    String
+  site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
   title     String
   createdAt DateTime   @default(now())
   questions Question[]
   attempts  QuizAttempt[]
+
+  @@index([siteId])
 }
 
 model QuizAttempt {

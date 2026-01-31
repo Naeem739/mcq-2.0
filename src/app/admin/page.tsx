@@ -4,6 +4,7 @@ import UploadForm from "./UploadForm";
 import { deleteQuizAdmin, uploadQuizAdmin, updateQuizTitle } from "./actions";
 import { adminLogout } from "./login/actions";
 import EditQuizTitle from "@/components/EditQuizTitle";
+import { getAdminSiteId } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,13 @@ type QuizWithCount = {
 };
 
 export default async function AdminPage() {
+  const siteId = await getAdminSiteId();
+  if (!siteId) {
+    return null;
+  }
+
   const quizzes = await prisma.quiz.findMany({
+    where: { siteId },
     orderBy: { createdAt: "desc" },
     include: {
       _count: {

@@ -20,15 +20,20 @@ export async function getUserFromCookie() {
   }
 }
 
-export async function setUserCookie(userId: string, email: string, name?: string) {
+export async function setUserCookie(userId: string, email: string, name?: string, siteId?: string) {
   const c = await cookies();
-  c.set(USER_COOKIE, JSON.stringify({ userId, email, name }), {
+  c.set(USER_COOKIE, JSON.stringify({ userId, email, name, siteId }), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
+}
+
+export async function getUserSiteId() {
+  const user = await getUserFromCookie();
+  return user?.siteId || null;
 }
 
 export async function clearUserCookie() {
