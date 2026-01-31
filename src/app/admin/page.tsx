@@ -4,6 +4,7 @@ import UploadForm from "./UploadForm";
 import { deleteQuizAdmin, uploadQuizAdmin, updateQuizTitle } from "./actions";
 import { adminLogout } from "./login/actions";
 import EditQuizTitle from "@/components/EditQuizTitle";
+import DeleteQuizButton from "@/components/DeleteQuizButton";
 import { getAdminSiteId } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
@@ -117,19 +118,10 @@ export default async function AdminPage() {
                           Open
                         </Link>
 
-                        <form action={deleteQuizAdmin}>
-                          <input
-                            type="hidden"
-                            name="quizId"
-                            value={q.id}
-                          />
-                          <button
-                            type="submit"
-                            className="rounded-lg sm:rounded-xl bg-red-600 px-3 py-1.5 sm:py-2 text-xs font-semibold text-white hover:bg-red-700 transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </form>
+                        <DeleteQuizButton
+                          quizId={q.id}
+                          action={deleteQuizAdmin}
+                        />
                       </div>
                     </div>
                   </div>
