@@ -23,7 +23,7 @@ type QuizWithCount = {
   questions: {
     id: string;
     text: string;
-    options: string[];
+    options: string[] | any; // Prisma returns Json type
     correctIndex: number;
   }[];
   _count: {

@@ -8,7 +8,7 @@ type UpdateResult = { ok: false; error: string } | { ok: true; message: string }
 type Question = {
   id: string;
   text: string;
-  options: string[];
+  options: string[] | any; // Prisma Json type
   correctIndex: number;
 };
 

@@ -8,7 +8,7 @@ import EditQuizModal from "./EditQuizModal";
 type Question = {
   id: string;
   text: string;
-  options: string[];
+  options: string[] | any; // Prisma Json type
   correctIndex: number;
 };
 
