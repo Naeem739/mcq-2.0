@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-type DeleteResult = { ok: false; error: string } | { ok: true; message: string } | undefined;
+type DeleteResult = { ok: false; error: string } | { ok: true; message?: string } | undefined;
 
 export default function DeleteQuizButton({
   quizId,
