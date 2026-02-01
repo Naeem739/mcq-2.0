@@ -57,8 +57,8 @@ export default function UploadForm({
               className="w-4 h-4 text-blue-600"
             />
             <div>
-              <div className="font-medium text-slate-900">📄 CSV File</div>
-              <div className="text-xs text-slate-600">Upload .csv file</div>
+              <div className="font-medium text-slate-900">📄 CSV / Excel File</div>
+              <div className="text-xs text-slate-600">Upload .csv or .xlsx/.xls</div>
             </div>
           </label>
           <label className="flex items-center gap-3 cursor-pointer flex-1 p-3 rounded-lg hover:bg-white transition-colors">
@@ -80,11 +80,11 @@ export default function UploadForm({
 
       {inputType === "csv" && (
         <div>
-          <label className="mb-2 block text-sm font-semibold text-slate-900">Select CSV File</label>
+          <label className="mb-2 block text-sm font-semibold text-slate-900">Select CSV or Excel File</label>
           <input
             name="file"
             type="file"
-            accept=".csv,text/csv"
+            accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-600 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700 transition-all cursor-pointer"
           />
         </div>

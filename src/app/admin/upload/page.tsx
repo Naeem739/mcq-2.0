@@ -100,12 +100,12 @@ export default async function AdminUploadPage() {
         <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">📤 Upload Quiz</h2>
-            <p className="text-slate-600">Import questions from CSV or JSON format</p>
+            <p className="text-slate-600">Import questions from CSV, Excel (XLSX), or JSON format</p>
           </div>
           
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6">
             <p className="text-sm text-slate-700 font-medium">
-              <span className="font-semibold">CSV Format:</span> question, optionA, optionB, optionC, optionD, answer (A/B/C/D or 0-3)
+              <span className="font-semibold">CSV/XLSX Format:</span> question, optionA, optionB, optionC, optionD, answer (A/B/C/D or 0-3)
             </p>
           </div>
 

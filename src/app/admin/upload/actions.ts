@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { parseQuizCsv } from "@/lib/quizCsv";
 import { parseQuizJson } from "@/lib/quizJson";
 import { isAdminAuthed, getAdminSiteId } from "@/lib/adminAuth";
+import * as XLSX from "xlsx";
 
 export async function uploadQuiz(formData: FormData) {
   if (!(await isAdminAuthed())) {
@@ -36,11 +37,24 @@ export async function uploadQuiz(formData: FormData) {
     questions = result.questions;
     errors = result.errors;
   } else {
-    // CSV mode
+    // CSV/XLSX mode
     if (!(file instanceof File)) {
-      return { ok: false as const, error: "Please select a CSV file." };
+      return { ok: false as const, error: "Please select a CSV or Excel file." };
     }
-    const csvText = await file.text();
+
+    const fileName = file.name.toLowerCase();
+    let csvText = "";
+
+    if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const firstSheet = workbook.Sheets[firstSheetName];
+      csvText = XLSX.utils.sheet_to_csv(firstSheet, { blankrows: false });
+    } else {
+      csvText = await file.text();
+    }
+
     const result = parseQuizCsv(csvText);
     questions = result.questions;
     errors = result.errors;
@@ -55,8 +69,9 @@ export async function uploadQuiz(formData: FormData) {
   }
 
   const quizTitle =
-    title || (inputType === "csv" && file instanceof File ? file.name.replace(/\.csv$/i, "") : "Untitled Quiz");
+    title || (inputType === "csv" && file instanceof File ? file.name.replace(/\.(csv|xlsx|xls)$/i, "") : "Untitled Quiz");
 
+  let quizId: string | null = null;
   try {
     const quiz = await prisma.quiz.create({
       data: {
@@ -73,10 +88,11 @@ export async function uploadQuiz(formData: FormData) {
       },
       select: { id: true },
     });
-
-    redirect(`/practice/${quiz.id}`);
+    quizId = quiz.id;
   } catch (error) {
     return { ok: false as const, error: "Failed to create quiz. Please try again." };
   }
+
+  redirect(`/practice/${quizId}`);
 }
 
