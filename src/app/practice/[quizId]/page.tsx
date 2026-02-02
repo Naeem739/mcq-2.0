@@ -148,5 +148,5 @@ export default async function PracticePage({
     }
   }
 
-  return <PracticeClient quizId={quizId} quizTitle={quiz.title} questions={questions} studentName={studentName} />;
+  return <PracticeClient quizId={quizId} quizTitle={quiz.title} chapter={quiz.chapter} questions={questions} studentName={studentName} />;
 }

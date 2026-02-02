@@ -19,6 +19,8 @@ model Site {
   users          User[]
   quizzes        Quiz[]
   adminRequests  AdminRequest[]
+  blogPosts      BlogPost[]
+  exams          Exam[]
 }
 
 model Admin {
@@ -60,6 +62,7 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   attempts  QuizAttempt[]
+  examAttempts ExamAttempt[]
 
   @@unique([siteId, email])
   @@index([siteId])
@@ -70,11 +73,13 @@ model Quiz {
   siteId    String
   site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
   title     String
+  chapter   Int        @default(1) // 1-6 for HSC ICT chapters
   createdAt DateTime   @default(now())
   questions Question[]
   attempts  QuizAttempt[]
 
   @@index([siteId])
+  @@index([siteId, chapter])
 }
 
 model QuizAttempt {
@@ -112,4 +117,70 @@ model Question {
   createdAt    DateTime @default(now())
 
   @@index([quizId])
+}
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([siteId])
+}
+
+model Exam {
+  id            String   @id @default(cuid())
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  title         String
+  duration      Int      // Duration in minutes
+  scheduledAt   DateTime // Exam start time
+  createdAt     DateTime @default(now())
+  
+  questions     ExamQuestion[]
+  attempts      ExamAttempt[]
+
+  @@index([siteId])
+  @@index([siteId, scheduledAt])
+}
+
+model ExamQuestion {
+  id           String   @id @default(cuid())
+  examId       String
+  exam         Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  
+  text         String
+  options      Json     // string[]
+  correctIndex Int
+  
+  createdAt    DateTime @default(now())
+
+  @@index([examId])
+}
+
+model ExamAttempt {
+  id               String   @id @default(cuid())
+  examId           String
+  exam             Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  studentName      String
+  totalQuestions   Int
+  correctAnswers   Int
+  wrongAnswers     Int
+  skippedQuestions Int
+  
+  startTime        DateTime
+  endTime          DateTime
+  totalTimeSeconds Int
+  
+  createdAt        DateTime @default(now())
+
+  @@index([examId])
+  @@index([userId])
+  @@unique([examId, userId]) // Each user can attempt an exam only once
 }

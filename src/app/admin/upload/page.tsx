@@ -10,6 +10,7 @@ import EditQuizTitle from "@/components/EditQuizTitle";
 import StudentPerformance from "@/components/StudentPerformance";
 import DeleteQuizButton from "@/components/DeleteQuizButton";
 import QuizCard from "@/components/QuizCard";
+import AdminTabNav from "@/components/AdminTabNav";
 
 export const dynamic = "force-dynamic";
 
@@ -78,29 +79,32 @@ export default async function AdminUploadPage() {
           <div className="inline-block rounded-full bg-blue-100 px-4 py-1.5 mb-4">
             <p className="text-xs sm:text-sm font-semibold text-blue-700">👨‍💼 Admin Dashboard</p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
-                Quiz Management
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-2">
+                Content Management
               </h1>
-              <p className="text-base sm:text-lg text-slate-600">Create, manage, and monitor your quizzes</p>
+              <p className="text-base sm:text-lg text-slate-600">Manage quizzes, exams, and blog content</p>
             </div>
             <form action={adminLogout}>
               <button
-                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                 type="submit"
               >
-                Admin Logout
+                Logout
               </button>
             </form>
           </div>
+
+          {/* Tab Navigation */}
+          <AdminTabNav />
         </div>
 
         {/* Upload Section */}
         <div className="mb-8 sm:mb-12 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-lg">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">📤 Upload Quiz</h2>
-            <p className="text-slate-600">Import questions from CSV, Excel (XLSX), or JSON format</p>
+            <p className="text-slate-600">Import questions from CSV, Excel (XLSX), JSON, Content Upload, or add them manually</p>
           </div>
           
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6">
@@ -142,13 +146,11 @@ question,optionA,optionB,optionC,optionD,answer
           </div>
 
           {quizzes.length === 0 ? (
-            <div className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
-              <div className="text-4xl mb-3">🗂️</div>
-              <p className="text-lg font-medium text-slate-900 mb-2">No Quizzes Yet</p>
-              <p className="text-slate-600">Upload your first quiz using the form above</p>
+            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+              <p className="text-slate-600">No quizzes yet. Upload your first quiz using the form above.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="divide-y divide-slate-200 border border-slate-200 rounded-lg overflow-hidden">
               {quizzes.map((q: QuizWithCount) => (
                 <QuizCard
                   key={q.id}

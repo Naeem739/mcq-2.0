@@ -9,12 +9,10 @@ import { getAdminSiteId } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Quiz type with question count
- */
 type QuizWithCount = {
   id: string;
   title: string;
+  chapter: number;
   createdAt: Date;
   _count: {
     questions: number;
@@ -100,11 +98,16 @@ export default async function AdminPage() {
                     className="flex flex-col gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3"
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
-                      <EditQuizTitle
-                        quizId={q.id}
-                        currentTitle={q.title}
-                        action={updateQuizTitle}
-                      />
+                      <div className="flex-1 min-w-0">
+                        <EditQuizTitle
+                          quizId={q.id}
+                          currentTitle={q.title}
+                          action={updateQuizTitle}
+                        />
+                        <div className="mt-1 text-xs text-zinc-500">
+                          Chapter {q.chapter}
+                        </div>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div className="text-xs text-zinc-500">

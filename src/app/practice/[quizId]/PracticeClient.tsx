@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { submitQuizAttempt } from "./submitActions";
@@ -14,15 +15,18 @@ export type PracticeQuestion = {
 
 export default function PracticeClient({
   quizTitle,
+  chapter,
   questions,
   quizId,
   studentName,
 }: {
   quizTitle: string;
+  chapter?: number;
   questions: PracticeQuestion[];
   quizId: string;
   studentName: string;
 }) {
+  const router = useRouter();
   const isBangla = (s: string) => /[\u0980-\u09FF]/.test(s);
   const total = questions.length;
   const totalTimeInMinutes = total; // Total time in minutes = number of questions
@@ -190,20 +194,27 @@ export default function PracticeClient({
         {/* Header Section */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1">
-            <div className="inline-block rounded-full bg-blue-100 px-3 py-1 mb-3">
-              <span className="text-xs sm:text-sm font-semibold text-blue-700">{quizTitle}</span>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="inline-block rounded-full bg-blue-100 px-3 py-1">
+                <span className="text-xs sm:text-sm font-semibold text-blue-700">{quizTitle}</span>
+              </div>
+              {chapter && (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 px-3 py-1">
+                  <span className="text-xs font-semibold text-purple-700">Ch {chapter}</span>
+                </div>
+              )}
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
               {isReviewMode ? "Review Mode" : "Practice Quiz"}
             </h1>
             <p className="mt-1 text-sm text-slate-600">Question {idx + 1} of {total}</p>
           </div>
-          <Link
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center justify-center rounded-full bg-white border border-slate-200 px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all"
-            href="/"
           >
             ← Back
-          </Link>
+          </button>
         </div>
 
         {/* Stats Bar */}

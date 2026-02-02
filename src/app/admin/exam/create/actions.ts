@@ -7,7 +7,7 @@ import { parseQuizJson } from "@/lib/quizJson";
 import { isAdminAuthed, getAdminSiteId } from "@/lib/adminAuth";
 import * as XLSX from "xlsx";
 
-export async function uploadQuiz(formData: FormData) {
+export async function createExam(formData: FormData) {
   if (!(await isAdminAuthed())) {
     return { ok: false as const, error: "Not authorized. Please login to admin first." };
   }
@@ -17,23 +17,44 @@ export async function uploadQuiz(formData: FormData) {
   }
 
   const title = String(formData.get("title") ?? "").trim();
-  const chapter = parseInt(String(formData.get("chapter") ?? "1"), 10) || 1;
-  const inputType = String(formData.get("inputType") ?? "csv");
+  const duration = parseInt(String(formData.get("duration") ?? "60"), 10);
+  const scheduledAt = String(formData.get("scheduledAt") ?? "").trim();
+  const inputType = String(formData.get("inputType") ?? "manual");
   const file = formData.get("file");
   const jsonText = String(formData.get("jsonText") ?? "").trim();
   const contentText = String(formData.get("contentText") ?? "").trim();
   const questionsData = String(formData.get("questionsData") ?? "").trim();
 
+  if (!title) {
+    return { ok: false as const, error: "Exam title is required." };
+  }
+
+  if (!scheduledAt) {
+    return { ok: false as const, error: "Schedule date and time is required." };
+  }
+
+  const scheduledDate = new Date(scheduledAt);
+  if (isNaN(scheduledDate.getTime())) {
+    return { ok: false as const, error: "Invalid schedule date." };
+  }
+
+  if (scheduledDate < new Date()) {
+    return { ok: false as const, error: "Schedule date must be in the future." };
+  }
+
+  if (duration < 1) {
+    return { ok: false as const, error: "Duration must be at least 1 minute." };
+  }
+
   let questions: Array<{
     text: string;
     options: string[];
     correctIndex: number;
-    hint?: string;
   }> = [];
   let errors: string[] = [];
 
+  // Parse questions based on input type (same logic as quiz upload)
   if (inputType === "manual") {
-    // Handle manual input
     if (!questionsData) {
       return { ok: false as const, error: "Please add at least one question." };
     }
@@ -71,7 +92,6 @@ export async function uploadQuiz(formData: FormData) {
       return { ok: false as const, error: "Failed to process manual questions." };
     }
   } else if (inputType === "content") {
-    // Handle content upload (CSV-like format)
     if (!contentText) {
       return { ok: false as const, error: "Please provide content text." };
     }
@@ -79,39 +99,24 @@ export async function uploadQuiz(formData: FormData) {
     try {
       const lines = contentText.split('\n').map(line => line.trim()).filter(line => line);
       
-      // Skip header line if present
-      let startIndex = 0;
-      if (lines[0]?.toLowerCase().includes('question')) {
-        startIndex = 1;
-      }
-
-      for (let i = startIndex; i < lines.length; i++) {
+      for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        const parts = line.split(',').map(p => p.trim());
         
-        // Parse CSV-like format: Question,OptionA,OptionB,OptionC,OptionD,Answer
-        // Allow commas inside the question by taking the last 5 comma-separated parts as options+answer
-        const rawParts = line.split(',').map(part => part.trim());
-        const nonEmptyParts = rawParts.filter(part => part);
-        
-        if (nonEmptyParts.length < 6) {
-          errors.push(`Line ${i + 1}: Incomplete question (need: question, 4 options, answer)`);
+        if (parts.length < 6) {
+          errors.push(`Line ${i + 1}: Not enough parts. Expected at least 6 (question, 4 options, answer)`);
           continue;
         }
 
-        const parts = nonEmptyParts;
-        const questionText = parts.slice(0, parts.length - 5).join(",");
+        const questionText = parts.slice(0, -5).join(', ');
         const optionA = parts[parts.length - 5];
         const optionB = parts[parts.length - 4];
         const optionC = parts[parts.length - 3];
         const optionD = parts[parts.length - 2];
         const answer = parts[parts.length - 1].toUpperCase();
 
-        if (!questionText?.trim()) {
+        if (!questionText) {
           errors.push(`Line ${i + 1}: Question text is required`);
-          continue;
-        }
-        if (!optionA?.trim() || !optionB?.trim() || !optionC?.trim() || !optionD?.trim()) {
-          errors.push(`Line ${i + 1}: All four options are required`);
           continue;
         }
 
@@ -119,18 +124,18 @@ export async function uploadQuiz(formData: FormData) {
         const correctIndex = answerMap[answer];
 
         if (correctIndex === undefined) {
-          errors.push(`Line ${i + 1}: Invalid answer (must be A, B, C, or D)`);
+          errors.push(`Line ${i + 1}: Invalid answer "${answer}". Must be A, B, C, or D`);
           continue;
         }
 
         questions.push({
-          text: questionText.trim(),
-          options: [optionA.trim(), optionB.trim(), optionC.trim(), optionD.trim()],
+          text: questionText,
+          options: [optionA, optionB, optionC, optionD],
           correctIndex,
         });
       }
     } catch (error) {
-      return { ok: false as const, error: "Failed to process content. Please check the CSV format." };
+      return { ok: false as const, error: "Failed to parse content text." };
     }
   } else if (inputType === "json") {
     if (!jsonText) {
@@ -171,32 +176,31 @@ export async function uploadQuiz(formData: FormData) {
     return { ok: false as const, error: "No valid questions found." };
   }
 
-  const quizTitle =
-    title || (inputType === "csv" && file instanceof File ? file.name.replace(/\.(csv|xlsx|xls)$/i, "") : "Untitled Quiz");
-
-  let quizId: string | null = null;
   try {
-    const quiz = await prisma.quiz.create({
+    const exam = await prisma.exam.create({
       data: {
-        title: quizTitle,
-        chapter: chapter,
-        siteId: siteId,
+        title,
+        duration,
+        scheduledAt: scheduledDate,
+        siteId,
         questions: {
           create: questions.map((q) => ({
             text: q.text,
             options: q.options,
             correctIndex: q.correctIndex,
-            hint: q.hint,
           })),
         },
       },
       select: { id: true },
     });
-    quizId = quiz.id;
-  } catch (error) {
-    return { ok: false as const, error: "Failed to create quiz. Please try again." };
+
+    redirect(`/admin/exam/${exam.id}`);
+  } catch (error: any) {
+    // Don't catch redirect errors - they're intentional
+    if (error?.message?.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+    console.error("Create exam error:", error);
+    return { ok: false as const, error: "Failed to create exam. Please try again." };
   }
-
-  redirect(`/practice/${quizId}`);
 }
-

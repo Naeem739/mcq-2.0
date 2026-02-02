@@ -36,6 +36,11 @@ export async function getUserSiteId() {
   return user?.siteId || null;
 }
 
+export async function getUserId() {
+  const user = await getUserFromCookie();
+  return user?.userId || null;
+}
+
 export async function clearUserCookie() {
   const c = await cookies();
   c.set(USER_COOKIE, "", { path: "/", maxAge: 0 });

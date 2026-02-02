@@ -15,12 +15,12 @@ type Question = {
   answer: string;
 };
 
-export default function UploadForm({
+export default function ExamUploadForm({
   action,
 }: {
   action: (formData: FormData) => Promise<UploadResult>;
 }) {
-  const [inputType, setInputType] = useState<"csv" | "json" | "manual" | "content">("csv");
+  const [inputType, setInputType] = useState<"csv" | "json" | "manual" | "content">("manual");
   const [questions, setQuestions] = useState<Question[]>([
     { id: crypto.randomUUID(), text: "", optionA: "", optionB: "", optionC: "", optionD: "", answer: "A" }
   ]);
@@ -63,6 +63,13 @@ export default function UploadForm({
     ));
   };
 
+  // Get minimum date (current date)
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  };
+
   return (
     <form action={formAction} className="space-y-5">
       {state?.ok === false ? (
@@ -73,29 +80,45 @@ export default function UploadForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="mb-2 block text-sm font-semibold text-slate-900">Quiz Title</label>
+          <label className="mb-2 block text-sm font-semibold text-slate-900">
+            Exam Title <span className="text-red-500">*</span>
+          </label>
           <input
             name="title"
-            placeholder="e.g. Digital Logic (Sign Magnitude)"
+            required
+            placeholder="e.g. Mid-term Exam - ICT"
             className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold text-slate-900">Chapter (HSC ICT)</label>
-          <select
-            name="chapter"
-            defaultValue="1"
-            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          >
-            <option value="1">Ch 1 - তথ্য ও যোগাযোগ প্রযুক্তি (Global & BD Context)</option>
-            <option value="2">Ch 2 - কমিউনিকেশন সিস্টেম ও নেটওয়ার্কিং</option>
-            <option value="3">Ch 3 - সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস</option>
-            <option value="4">Ch 4 - ওয়েব ডিজাইন ও HTML</option>
-            <option value="5">Ch 5 - প্রোগ্রামিং ভাষা</option>
-            <option value="6">Ch 6 - ডেটাবেজ ম্যানেজমেন্ট সিস্টেম</option>
-          </select>
+          <label className="mb-2 block text-sm font-semibold text-slate-900">
+            Duration (minutes) <span className="text-red-500">*</span>
+          </label>
+          <input
+            name="duration"
+            type="number"
+            min="1"
+            required
+            defaultValue="60"
+            placeholder="e.g. 60"
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
         </div>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-slate-900">
+          Schedule Date & Time <span className="text-red-500">*</span>
+        </label>
+        <input
+          name="scheduledAt"
+          type="datetime-local"
+          required
+          min={getMinDateTime()}
+          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        />
+        <p className="mt-1 text-xs text-slate-500">Students can take the exam after this time</p>
       </div>
 
       <div>
@@ -190,10 +213,7 @@ export default function UploadForm({
           <textarea
             name="contentText"
             rows={12}
-            placeholder="Format:
-Question,OptionA,OptionB,OptionC,OptionD,Answer
-What is the capital of Bangladesh?,Dhaka,Chittagong,Khulna,Rajshahi,A
-2 + 2 = ?,2,3,4,5,C"
+            placeholder="Question,OptionA,OptionB,OptionC,OptionD,Answer\nWhat is the capital of Bangladesh?,Dhaka,Chittagong,Khulna,Rajshahi,A"
             className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 font-mono outline-none placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y"
           />
         </div>
@@ -324,11 +344,10 @@ What is the capital of Bangladesh?,Dhaka,Chittagong,Khulna,Rajshahi,A
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
+        className="w-full rounded-lg bg-gradient-to-r from-green-600 to-green-700 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:from-green-700 hover:to-green-800 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
       >
-        {pending ? "⏳ Uploading..." : "✨ Create Quiz"}
+        {pending ? "⏳ Creating..." : "📅 Schedule Exam"}
       </button>
     </form>
   );
 }
-

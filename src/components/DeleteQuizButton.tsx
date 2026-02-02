@@ -39,10 +39,10 @@ export default function DeleteQuizButton({
     <button
       onClick={handleDelete}
       disabled={isPending}
-      className="w-full rounded-lg bg-red-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       type="button"
     >
-      {isPending ? "⏳ Deleting..." : "🗑️ Delete"}
+      {isPending ? "Deleting..." : "Delete"}
     </button>
   );
 }

@@ -44,6 +44,20 @@ export default async function Header() {
             </Link>
             {user && (
               <Link
+                href="/exam"
+                className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors whitespace-nowrap"
+              >
+                Exam
+              </Link>
+            )}
+            <Link
+              href="/blog"
+              className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors whitespace-nowrap"
+            >
+              Blog
+            </Link>
+            {user && (
+              <Link
                 href="/profile"
                 className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors whitespace-nowrap"
               >
@@ -65,6 +79,20 @@ export default async function Header() {
               className="rounded px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
             >
               Home
+            </Link>
+            {user && (
+              <Link
+                href="/exam"
+                className="rounded px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
+              >
+                Exam
+              </Link>
+            )}
+            <Link
+              href="/blog"
+              className="rounded px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
+            >
+              Blog
             </Link>
             {user && (
               <Link
